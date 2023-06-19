@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MiniMarket</title>
+  {% load static %}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}" type="text/css">
+</head>
+
+<body>
+  <a href="/">Ver Catálogo</a>
+  <h1 style="text-align: center;">Carrito de Compras</h1>
+  <div class="container">
+    <div class="row">
+      {% for producto in productos %}
+        <div class="producto-card">
+          <h2>{{ producto.producto.nombre }}</h2>
+          <p>Cantidad: {{ producto.cantidad }}</p>
+          <p>Precio: {{ producto.producto.precio }}</p>
+          <p>Subtotal: {{ producto.subtotal }}</p>
+          <img src="{{ producto.producto.imagen.url }}" alt="{{ producto.producto.nombre }}">
+          <button class="eliminar-producto" data-producto="{{ producto.producto.id }}">Eliminar del carrito</button>
+        </div>
+      {% empty %}
+        <p>No hay productos en el carrito.</p>
+      {% endfor %}
+
+  <p style="text-align: center;">Total: {{ total }}</p>
+
+  <script>
+    const eliminarProductoButtons = document.querySelectorAll('.eliminar-producto');
+    eliminarProductoButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const productId = button.dataset.producto;
+        fetch(`/eliminar-del-carrito/${productId}`)
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              button.parentNode.remove();
+            } else {
+              alert(data.message);
+            }
+          });
+      });
+    });
+  </script>
+
+</body>
+</html>
